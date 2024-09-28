@@ -1,0 +1,50 @@
+#!/usr/bin/osascript -l JavaScript
+
+function getEnvVars(...keys) {
+    return keys.map((key) => $.NSProcessInfo.processInfo.environment.objectForKey(key).js);
+}
+
+function run() {
+    const [cntRaw, prefix, lang, action, body_content, code] = getEnvVars(
+        "cnt",
+        "prefix",
+        "lang",
+        "action",
+        "body_content",
+        "code"
+    );
+    const cnt = cntRaw ? parseInt(cntRaw) + 1 : 0;
+    let jsonData = {};
+
+    switch (cnt) {
+        case 0:
+            const msg =
+                action === "update"
+                    ? `This snippet will be updated with the following information. If this looks correct, press Enter to confirm.\n\n* Language: \`${lang}\`\n* Prefix: \`${prefix}\`\n\n\`\`\`${lang}\n${code}\n\`\`\``
+                    : `This snippet will be deleted with the following information. If you are sure, press Enter to confirm.\n\n* Language: \`${lang}\`\n* Prefix: \`${prefix}\`\n\n\`\`\`${lang}\n${body_content}\n\`\`\``;
+            jsonData = {
+                response: msg,
+                variables: { cnt },
+                behaviour: {
+                    response: "replace",
+                    scroll: "start",
+                    inputfield: "select",
+                },
+            };
+            break;
+
+        case 1:
+            jsonData = {
+                actionoutput: true,
+            };
+            break;
+
+        default:
+            jsonData = {
+                response:
+                    "An unexpected state was detected. Please verify your input or restart the process.",
+            };
+            break;
+    }
+    return JSON.stringify(jsonData);
+}
