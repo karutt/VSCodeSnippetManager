@@ -1,5 +1,5 @@
 import os
-import json
+import json5, json
 import sys
 from search_utils import filter_and_rank_snippets
 
@@ -17,7 +17,7 @@ def get_user_query():
 
 def read_snippets_from_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
-        snippets = json.load(f)
+        snippets = json5.load(f)
     return snippets
 
 
